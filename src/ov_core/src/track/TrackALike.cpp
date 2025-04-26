@@ -169,6 +169,8 @@ void TrackALike::feed_monocular(const CameraData &message, size_t msg_id) {
   std::vector<cv::DMatch> refined_matches;
 
   //GMS_match_refine(pts_last[cam_id], pts_new, matches, refined_matches);
+  refined_matches = std::move(matches);
+
   assert(pts_new.size() == ids_last[cam_id].size());
   PRINT_ERROR(RED "[ALIKE-INFO]:  matches: %.zu\n" RESET, refined_matches.size());
 
@@ -223,11 +225,11 @@ void TrackALike::feed_monocular(const CameraData &message, size_t msg_id) {
       npt_l.x, npt_l.y); // Undistorted UVs
   }
 
-  PRINT_ERROR(RED "[TIME-KLT]: %.4fms Image fed and read\n" RESET, (rT2 - rT1).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-KLT]: %.4fms ALike + DKD \n" RESET, (rT3 - rT2).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-KLT]: %.4fms Cosine similarity matching \n" RESET, (rT4 - rT3).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-KLT]: %.4fms Sorting and postprocess \n" RESET, (rT5 - rT4).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-KLT]: %.4fms for total\n" RESET, (rT5 - rT1).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-ALIKE]: %.4fms Image fed and read\n" RESET, (rT2 - rT1).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-ALIKE]: %.4fms ALike + DKD \n" RESET, (rT3 - rT2).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-ALIKE]: %.4fms Cosine similarity matching \n" RESET, (rT4 - rT3).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-ALIKE]: %.4fms Sorting and postprocess \n" RESET, (rT5 - rT4).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-ALIKE]: %.4fms for total\n" RESET, (rT5 - rT1).total_microseconds() * 1e-3);
 }
 
 void TrackALike::perform_detection_monocular(const cv::Mat &img, const cv::Mat &mask, std::vector<cv::KeyPoint> &pts0, Eigen::MatrixXf& descriptors) {

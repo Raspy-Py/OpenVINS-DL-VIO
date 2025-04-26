@@ -23,7 +23,7 @@ cd /opt/baza
 
 4. Build the project (it takes a while)
 ```bash
-# For the first time build you may wanna limit the amout of jobs, if you have less then 20GB of RAM
+# For the first time build you may wanna limit the amout of jobs, if you have less than 20GB of RAM
 catkin config --jobs 4 
 ```
 
@@ -45,3 +45,32 @@ Check inside `/opt/baza/images/test_examples` for such expected results
 | ![scores_map](images/test_examples/scores_map.png) | ![labeled_score_map](images/test_examples/labeled_score_map.png) | ![results_image](images/test_examples/results_image.png) |
 |:----------------------:|:----------------------:|:----------------------:|
 | scores map | labeled scores map | results image |
+
+
+## Usage
+
+### Run OpenVINS in serial mode
+```bash
+roslaunch ov_msckf serial.launch \
+    max_cameras:=1 use_stereo:=false dosave:=true dobag:=true \
+    config:=uzhfpv_indoor \
+    bag:=/opt/baza/datasets/indoor_forward_3_snapdragon_with_gt.bag \
+    path_est:=/opt/baza/evals/uzhfpv_indoor_3_mix.txt
+```
+
+### Plot the generated trajectory
+```bash
+rosrun ov_eval plot_trajectories posyaw \
+    /opt/baza/src/ov_data/uzhfpv_indoor/indoor_forward_3_snapdragon_with_gt.txt \
+    /opt/baza/evals/uzhfpv_indoor_3_mix.txt \
+    /opt/baza/evals/uzhfpv_indoor_3_klt.txt
+```
+
+
+### Calculate errors for the generated trajectory
+```bash
+rosrun ov_eval error_comparison posyaw \
+    /opt/baza/src/ov_data/uzhfpv_indoor/indoor_forward_3_snapdragon_with_gt.txt \
+    /opt/baza/evals/uzhfpv_indoor_3_mix.txt \
+    /opt/baza/evals/uzhfpv_indoor_3_klt.txt
+```

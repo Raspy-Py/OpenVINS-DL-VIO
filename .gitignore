@@ -3,6 +3,8 @@ build/
 devel/
 install/
 logs/
+evals/
+*.bag
 .catkin_workspace
 .catkin_tools/
 

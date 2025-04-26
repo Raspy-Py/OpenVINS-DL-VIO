@@ -1,0 +1,3 @@
+http://rpg.ifi.uzh.ch/datasets/uzh-fpv-newer-versions/v3/outdoor_forward_1_snapdragon_with_gt.bag
+http://rpg.ifi.uzh.ch/datasets/uzh-fpv-newer-versions/v3/outdoor_forward_3_snapdragon_with_gt.bag
+http://rpg.ifi.uzh.ch/datasets/uzh-fpv-newer-versions/v3/outdoor_forward_5_snapdragon_with_gt.bag

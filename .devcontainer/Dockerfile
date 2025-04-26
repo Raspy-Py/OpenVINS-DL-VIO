@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     python3-catkin-tools \
     python3-osrf-pycommon \
     wget \
+    curl \
     gnupg2 \
     protobuf-compiler \
     libprotoc-dev \

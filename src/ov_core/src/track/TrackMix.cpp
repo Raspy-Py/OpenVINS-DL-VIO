@@ -283,11 +283,11 @@ void TrackMix::feed_monocular(const CameraData &message, size_t msg_id) {
   }
   rT5 = boost::posix_time::microsec_clock::local_time();
 
-  PRINT_ERROR(RED "[TIME-Mix]: %.4fms initial affine estimate\n" RESET, (rT2 - rT1).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-Mix]: %.4fms FAST detection \n" RESET, (rT3 - rT2).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-Mix]: %.4fms KLT matching \n" RESET, (rT4 - rT3).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-Mix]: %.4fms sorting and postprocess \n" RESET, (rT5 - rT4).total_microseconds() * 1e-3);
-  PRINT_ERROR(RED "[TIME-Mix]: %.4fms for total\n" RESET, (rT5 - rT1).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-Mix]: %.4fms initial affine estimate\n" RESET, (rT2 - rT1).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-Mix]: %.4fms FAST detection \n" RESET, (rT3 - rT2).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-Mix]: %.4fms KLT matching \n" RESET, (rT4 - rT3).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-Mix]: %.4fms sorting and postprocess \n" RESET, (rT5 - rT4).total_microseconds() * 1e-3);
+  // PRINT_DEBUG(RED "[TIME-Mix]: %.4fms for total\n" RESET, (rT5 - rT1).total_microseconds() * 1e-3);
 }
 
 
@@ -322,6 +322,7 @@ cv::Mat TrackMix::estimate_initial_affine(cv::Mat& img, cv::Mat& mask) {
 
   // Not enough matches to estimate affine matrix
   if (alike_matches.size() < 8) {
+    PRINT_DEBUG(YELLOW "Not enough matches (%zu) to make an initial affine estimate\n" RESET, alike_matches.size());
     return cv::Mat::eye(2, 3, CV_64F);
   }
 
@@ -337,7 +338,10 @@ cv::Mat TrackMix::estimate_initial_affine(cv::Mat& img, cv::Mat& mask) {
     kpts_curr.push_back(alike_pts_new[match.trainIdx]);
   }
   cv::Mat affine_matrix = cv::estimateAffine2D(kpts_prev, kpts_curr);
-
+  if (affine_matrix.empty()) {
+    PRINT_DEBUG(YELLOW "Affine estimation failed. Returning identity transformation.\n" RESET, alike_matches.size());
+    affine_matrix = cv::Mat::eye(2, 3, CV_64F);
+}
   { // Update last vars
     std::lock_guard<std::mutex> lckv(mtx_alike_last_vars);
     alike_pts_last = alike_pts_new;

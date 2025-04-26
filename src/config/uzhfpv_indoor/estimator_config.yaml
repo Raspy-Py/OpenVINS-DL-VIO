@@ -77,9 +77,9 @@ filepath_gt: "/tmp/ov_groundtruth.txt"
 
 # ["Mix", "ALike", "KLT"]
 #  ALike - CNN for features, MNN for tracking
-#  KLT   - FAST feaatures, KLT for tracking
+#  KLT   - FAST features, KLT for tracking
 #  Mix   - ALike for affine guess, then FAST features and KLT for tracking
-tracker_type: KLT
+tracker_type: Mix
 
 # our front-end feature tracking parameters
 # we have a KLT and descriptor based (KLT is better implemented...)
