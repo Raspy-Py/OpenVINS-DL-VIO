@@ -1,0 +1,116 @@
+# ROS specific
+build/
+devel/
+install/
+logs/
+.catkin_workspace
+.catkin_tools/
+
+# Build artifacts
+*.o
+*.so
+*.a
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.la
+*.lo
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+catkin_generated/
+gtest/
+test_results/
+
+# CUDA related
+*.i
+*.ii
+*.gpu
+*.ptx
+*.cubin
+*.fatbin
+*.ptx
+*.cu.cpp
+
+# OpenVINS specific
+*.bag
+*.bag.active
+*_results/
+openvins_output/
+
+# C/C++ specific
+*.d
+*.slo
+*.lo
+*.o
+*.obj
+*.gch
+*.pch
+*.so.*
+*.dylib
+*.mod
+*.smod
+*.lai
+*.la
+*.a
+*.lib
+*.exe
+*.dll
+*.out
+*.app
+
+# Python (for ROS scripts)
+*.py[cod]
+*$py.class
+__pycache__/
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE/editors
+# VSCode
+.vscode/
+*.code-workspace
+
+# CLion
+.idea/
+*.iml
+*.iws
+*.ipr
+cmake-build-*/
+
+# Eclipse
+.project
+.cproject
+.settings/
+
+# User-specific files
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# System specific
+core
