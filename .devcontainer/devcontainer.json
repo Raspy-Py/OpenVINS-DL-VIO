@@ -1,0 +1,14 @@
+{
+    "name": "ros-cuda-onnxruntime",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "--privileged",
+        "--network=host",
+        "--gpus=all"
+    ],
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/opt/baza,type=bind",
+    "workspaceFolder": "/opt/baza"
+}
