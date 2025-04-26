@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.3)
 
 # Find ROS build system
-find_package(catkin QUIET COMPONENTS roscpp rosbag sensor_msgs cv_bridge)
+find_package(catkin QUIET COMPONENTS roscpp rosbag sensor_msgs cv_bridge alike_extractor)
 
 # Describe ROS project
+option(ENABLE_ROS "Enable or disable building with ROS (if it is found)" ON)
 if (catkin_FOUND AND ENABLE_ROS)
     add_definitions(-DROS_AVAILABLE=1)
     catkin_package(
-            CATKIN_DEPENDS roscpp rosbag sensor_msgs cv_bridge
+            CATKIN_DEPENDS roscpp rosbag sensor_msgs cv_bridge alike_extractor
             INCLUDE_DIRS src/
             LIBRARIES ov_core_lib
     )
@@ -48,6 +49,8 @@ list(APPEND LIBRARY_SOURCES
         src/track/TrackAruco.cpp
         src/track/TrackDescriptor.cpp
         src/track/TrackKLT.cpp
+        src/track/TrackALike.cpp
+        src/track/TrackMix.cpp
         src/track/TrackSIM.cpp
         src/types/Landmark.cpp
         src/feat/Feature.cpp

@@ -496,7 +496,7 @@ void ROS1Visualizer::callback_inertial(const sensor_msgs::Imu::ConstPtr &msg) {
 }
 
 void ROS1Visualizer::callback_monocular(const sensor_msgs::ImageConstPtr &msg0, int cam_id0) {
-
+  // ROS_INFO("Image encoding: %s", msg0->encoding.c_str());
   // Check if we should drop this image
   double timestamp = msg0->header.stamp.toSec();
   double time_delta = 1.0 / _app->get_params().track_frequency;
@@ -507,8 +507,10 @@ void ROS1Visualizer::callback_monocular(const sensor_msgs::ImageConstPtr &msg0, 
 
   // Get the image
   cv_bridge::CvImageConstPtr cv_ptr;
+  cv_bridge::CvImageConstPtr cv_ptr_rgb;
   try {
     cv_ptr = cv_bridge::toCvShare(msg0, sensor_msgs::image_encodings::MONO8);
+    cv_ptr_rgb = cv_bridge::toCvShare(msg0, sensor_msgs::image_encodings::RGB8);
   } catch (cv_bridge::Exception &e) {
     PRINT_ERROR("cv_bridge exception: %s", e.what());
     return;
@@ -519,6 +521,7 @@ void ROS1Visualizer::callback_monocular(const sensor_msgs::ImageConstPtr &msg0, 
   message.timestamp = cv_ptr->header.stamp.toSec();
   message.sensor_ids.push_back(cam_id0);
   message.images.push_back(cv_ptr->image.clone());
+  message.rgb_images.push_back(cv_ptr_rgb->image.clone());
 
   // Load the mask if we are using it, else it is empty
   // TODO: in the future we should get this from external pixel segmentation

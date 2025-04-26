@@ -63,6 +63,9 @@ struct CameraData {
   /// Raw image we have collected for each camera
   std::vector<cv::Mat> images;
 
+  /// Same raw image but in RGB
+  std::vector<cv::Mat> rgb_images;
+
   /// Tracking masks for each camera we have
   std::vector<cv::Mat> masks;
 

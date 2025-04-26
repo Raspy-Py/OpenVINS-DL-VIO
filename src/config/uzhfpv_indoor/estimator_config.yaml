@@ -4,8 +4,10 @@ verbosity: "INFO" # ALL, DEBUG, INFO, WARNING, ERROR, SILENT
 
 use_fej: true # if first-estimate Jacobians should be used (enable for good consistency)
 integration: "rk4" # discrete, rk4, analytical (if rk4 or analytical used then analytical covariance propagation is used)
-use_stereo: true # if we have more than 1 camera, if we should try to track stereo constraints
-max_cameras: 2 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
+# use_stereo: true # if we have more than 1 camera, if we should try to track stereo constraints
+# max_cameras: 2 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
+use_stereo: false # if we have more than 1 camera, if we should try to track stereo constraints between pairs
+max_cameras: 1 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
 
 calib_cam_extrinsics: false
 calib_cam_intrinsics: true
@@ -39,7 +41,7 @@ zupt_only_at_beginning: false
 
 init_window_time: 2.0
 init_imu_thresh: 0.30
-init_max_disparity: 2.0
+init_max_disparity: 3.0
 init_max_features: 50
 
 init_dyn_use: false
@@ -73,10 +75,16 @@ filepath_gt: "/tmp/ov_groundtruth.txt"
 # ==================================================================
 # ==================================================================
 
+# ["Mix", "ALike", "KLT"]
+#  ALike - CNN for features, MNN for tracking
+#  KLT   - FAST feaatures, KLT for tracking
+#  Mix   - ALike for affine guess, then FAST features and KLT for tracking
+tracker_type: KLT
+
 # our front-end feature tracking parameters
 # we have a KLT and descriptor based (KLT is better implemented...)
-use_klt: true
-num_pts: 200
+# use_klt: false
+num_pts: 400
 fast_threshold: 50
 grid_x: 5
 grid_y: 5
@@ -89,9 +97,16 @@ histogram_method: "HISTOGRAM" # NONE, HISTOGRAM, CLAHE
 
 # aruco tag tracker for the system
 # DICT_6X6_1000 from https://chev.me/arucogen/
-use_aruco: false
+use_aruco: true
 num_aruco: 1024
 downsize_aruco: true
+
+# ALike-based tracker options
+alike_radius: 1 # Radius of the local regions on score map, from which max intensity keypoints are extracted. 
+                # (bigger radius - sparser points)
+alike_padding: 4 # ALike gives false positives on the borders. Adjust padding to remove them.
+alike_match_threshold: 0.9 # Threshold for filtering false positives from matched keypoints
+alike_model_path: "/opt/baza/src/alike_extractor/models/normal_640x480.onnx"
 
 # ==================================================================
 # ==================================================================

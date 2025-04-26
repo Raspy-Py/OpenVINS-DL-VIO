@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 project(ov_core)
 
+### OLD WAY TO LINK OpenCV
+
 # Include libraries (if we don't have opencv 4, then fallback to opencv 3)
 # The OpenCV version needs to match the one used by cv_bridge otherwise you will get a segmentation fault!
 find_package(Eigen3 REQUIRED)
@@ -11,8 +13,25 @@ endif ()
 find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time)
 message(STATUS "OPENCV: " ${OpenCV_VERSION} " | BOOST: " ${Boost_VERSION})
 
-# By default we build with ROS, but you can disable this and just build as a library
-option(ENABLE_ROS "Enable or disable building with ROS (if it is found)" ON)
+### NEW WAY TO INCLUDE
+
+#set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
+## Optionally, you can also set these additional hints
+#set(CMAKE_PREFIX_PATH "/usr/local" ${CMAKE_PREFIX_PATH})
+## Then modify the find_package call
+#find_package(OpenCV 3 QUIET
+#    PATHS "/usr/local"
+#    NO_DEFAULT_PATH
+#)
+#if (NOT OpenCV_FOUND)
+#    find_package(OpenCV 4 REQUIRED
+#        PATHS "/usr/local"
+#        NO_DEFAULT_PATH
+#    )
+#endif()
+#find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time)
+#message(STATUS "OPENCV: " ${OpenCV_VERSION} " | BOOST: " ${Boost_VERSION})
+
 
 # If we will compile with aruco support
 option(ENABLE_ARUCO_TAGS "Enable or disable aruco tag (disable if no contrib modules)" ON)
@@ -39,7 +58,9 @@ endif ()
 
 # We need c++14 for ROS2, thus just require it for everybody
 # NOTE: To future self, hope this isn't an issue...
-set(CMAKE_CXX_STANDARD 14)
+# NOTE [roman.naumenko]: this is an issue indeed. Switched to C++17, cause we use only ROS1, anyway.
+set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -54,14 +75,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -Wall -Wuninitialized -Wmaybe-uninit
 # NOTE: https://github.com/romainreignier/share_ros1_ros2_lib_demo
 find_package(catkin QUIET COMPONENTS roscpp)
 find_package(ament_cmake QUIET)
-if (catkin_FOUND AND ENABLE_ROS)
+if (catkin_FOUND)
     message(STATUS "ROS *1* version found, building ROS1.cmake")
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ROS1.cmake)
-elseif (ament_cmake_FOUND AND ENABLE_ROS)
+elseif (ament_cmake_FOUND)
     message(STATUS "ROS *2* version found, building ROS2.cmake")
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ROS2.cmake)
 else ()
-    message(STATUS "No ROS versions found or building with ROS disabled, building ROS1.cmake without ROS")
+    message(STATUS "No ROS versions found, building ROS1.cmake")
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ROS1.cmake)
 endif ()
 

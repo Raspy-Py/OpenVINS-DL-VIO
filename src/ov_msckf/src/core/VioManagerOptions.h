@@ -393,11 +393,11 @@ struct VioManagerOptions {
 
   // TRACKERS ===============================
 
+  /// Available tracker types: KLT, Alike, Mix
+  std::string tracker_type = "KTL";
+
   /// If we should process two cameras are being stereo or binocular. If binocular, we do monocular feature tracking on each image.
   bool use_stereo = true;
-
-  /// If we should use KLT tracking, or descriptor matcher
-  bool use_klt = true;
 
   /// If should extract aruco tags and estimate them
   bool use_aruco = true;
@@ -444,6 +444,21 @@ struct VioManagerOptions {
   /// Parameters used by our feature initialize / triangulator
   ov_core::FeatureInitializerOptions featinit_options;
 
+  // ALike specific parameters
+
+  /// Radius of the local regions on score map, from which max intensity keypoints are extracted. (bigger radius - sparser points)
+  int alike_radius = 1;
+
+  /// ALike gives false positives on the borders. Adjust padding to remove them.
+  int alike_padding = 2;
+
+  /// Threshold for filtering false positives from matched keypoints
+  float alike_match_threshold = 0.95;
+
+  /// Path to the ALike's CNN model weights
+  std::string alike_model_path = "/opt/baza/model/model.onnx";
+
+
   /**
    * @brief This function will load print out all parameters related to visual tracking
    * This allows for visual checking that everything was loaded properly from ROS/CMD parsers.
@@ -452,8 +467,8 @@ struct VioManagerOptions {
    */
   void print_and_load_trackers(const std::shared_ptr<ov_core::YamlParser> &parser = nullptr) {
     if (parser != nullptr) {
+      parser->parse_config("tracker_type", tracker_type);
       parser->parse_config("use_stereo", use_stereo);
-      parser->parse_config("use_klt", use_klt);
       parser->parse_config("use_aruco", use_aruco);
       parser->parse_config("downsize_aruco", downsize_aruco);
       parser->parse_config("downsample_cameras", downsample_cameras);
@@ -465,6 +480,10 @@ struct VioManagerOptions {
       parser->parse_config("grid_x", grid_x);
       parser->parse_config("grid_y", grid_y);
       parser->parse_config("min_px_dist", min_px_dist);
+      parser->parse_config("alike_radius", alike_radius);
+      parser->parse_config("alike_padding", alike_padding);
+      parser->parse_config("alike_match_threshold", alike_match_threshold);
+      parser->parse_config("alike_model_path", alike_model_path);
       std::string histogram_method_str = "HISTOGRAM";
       parser->parse_config("histogram_method", histogram_method_str);
       if (histogram_method_str == "NONE") {
@@ -484,8 +503,8 @@ struct VioManagerOptions {
       parser->parse_config("track_frequency", track_frequency);
     }
     PRINT_DEBUG("FEATURE TRACKING PARAMETERS:\n");
+    PRINT_DEBUG("  - tracker_type: %s\n", tracker_type.c_str());
     PRINT_DEBUG("  - use_stereo: %d\n", use_stereo);
-    PRINT_DEBUG("  - use_klt: %d\n", use_klt);
     PRINT_DEBUG("  - use_aruco: %d\n", use_aruco);
     PRINT_DEBUG("  - downsize aruco: %d\n", downsize_aruco);
     PRINT_DEBUG("  - downsize cameras: %d\n", downsample_cameras);
@@ -496,6 +515,9 @@ struct VioManagerOptions {
     PRINT_DEBUG("  - fast threshold: %d\n", fast_threshold);
     PRINT_DEBUG("  - grid X by Y: %d by %d\n", grid_x, grid_y);
     PRINT_DEBUG("  - min px dist: %d\n", min_px_dist);
+    PRINT_DEBUG("  - alike radius: %d\n", alike_radius);
+    PRINT_DEBUG("  - alike padding: %d\n", alike_padding);
+    PRINT_DEBUG("  - alike match threshold: %.2f\n", alike_match_threshold);
     PRINT_DEBUG("  - hist method: %d\n", (int)histogram_method);
     PRINT_DEBUG("  - knn ratio: %.3f\n", knn_ratio);
     PRINT_DEBUG("  - track frequency: %.1f\n", track_frequency);

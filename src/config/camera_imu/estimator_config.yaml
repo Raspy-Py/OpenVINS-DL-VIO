@@ -4,8 +4,6 @@ verbosity: "INFO" # ALL, DEBUG, INFO, WARNING, ERROR, SILENT
 
 use_fej: true # if first-estimate Jacobians should be used (enable for good consistency)
 integration: "rk4" # discrete, rk4, analytical (if rk4 or analytical used then analytical covariance propagation is used)
-# use_stereo: true # if we have more than 1 camera, if we should try to track stereo constraints between pairs
-# max_cameras: 2 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
 use_stereo: false # if we have more than 1 camera, if we should try to track stereo constraints between pairs
 max_cameras: 1 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
 
@@ -16,33 +14,38 @@ calib_imu_intrinsics: false # if imu intrinsics should be calibrated (rotation a
 calib_imu_g_sensitivity: false # if gyroscope gravity sensitivity (Tg) should be calibrated
 
 max_clones: 11 # how many clones in the sliding window
-max_slam: 50 # number of features in our state vector
+max_slam: 100 # number of features in our state vector
 max_slam_in_update: 25 # update can be split into sequential updates of batches, how many in a batch
-max_msckf_in_update: 40 # how many MSCKF features to use in the update
-dt_slam_delay: 1 # delay before initializing (helps with stability from bad initialization...)
+max_msckf_in_update: 50 # how many MSCKF features to use in the update
+dt_slam_delay: 3 # delay before initializing (helps with stability from bad initialization...)
 
 gravity_mag: 9.81 # magnitude of gravity in this location
 
 feat_rep_msckf: "GLOBAL_3D"
 feat_rep_slam: "ANCHORED_MSCKF_INVERSE_DEPTH"
 feat_rep_aruco: "ANCHORED_MSCKF_INVERSE_DEPTH"
+# feat_rep_slam: "ANCHORED_FULL_INVERSE_DEPTH"
+# feat_rep_aruco: "ANCHORED_FULL_INVERSE_DEPTH"
 
 # zero velocity update parameters we can use
 # we support either IMU-based or disparity detection.
 try_zupt: false
 zupt_chi2_multipler: 0 # set to 0 for only disp-based
 zupt_max_velocity: 0.1
-zupt_noise_multiplier: 10
-zupt_max_disparity: 0.5 # set to 0 for only imu-based
-zupt_only_at_beginning: false
+zupt_noise_multiplier: 50
+zupt_max_disparity: 1.5 # set to 0 for only imu-based
+zupt_only_at_beginning: true
 
 # ==================================================================
 # ==================================================================
 
 init_window_time: 2.0 # how many seconds to collect initialization information
-init_imu_thresh: 1.5 # threshold for variance of the accelerometer to detect a "jerk" in motion
-init_max_disparity: 10.0 # max disparity to consider the platform stationary (dependent on resolution)
-init_max_features: 50 # how many features to track during initialization (saves on computation)
+# init_window_time: 2.0 # how many seconds to collect initialization information
+# init_imu_thresh: 0.3 # threshold for variance of the accelerometer to detect a "jerk" in motion
+init_imu_thresh: 0.6 # threshold for variance of the accelerometer to detect a "jerk" in motion
+init_max_disparity: 2.0 # max disparity to consider the platform stationary (dependent on resolution)
+# init_max_disparity: 30.0 # max disparity to consider the platform stationary (dependent on resolution)
+init_max_features: 75 # how many features to track during initialization (saves on computation)
 
 init_dyn_use: false # if dynamic initialization should be used
 init_dyn_mle_opt_calib: false # if we should optimize calibration during intialization (not recommended)
@@ -60,31 +63,41 @@ init_dyn_min_rec_cond: 1e-12 # reciprocal condition number thresh for info inver
 
 init_dyn_bias_g: [ 0.0, 0.0, 0.0 ] # initial gyroscope bias guess
 init_dyn_bias_a: [ 0.0, 0.0, 0.0 ] # initial accelerometer bias guess
-
 # ==================================================================
 # ==================================================================
 
-record_timing_information: true # if we want to record timing information of the method
-record_timing_filepath: "/opt/baza/evals/traj_timing.txt" # https://docs.openvins.com/eval-timing.html#eval-ov-timing-flame
+record_timing_information: false # if we want to record timing information of the method
+record_timing_filepath: "/tmp/traj_timing.txt" # https://docs.openvins.com/eval-timing.html#eval-ov-timing-flame
 
 # if we want to save the simulation state and its diagional covariance
 # use this with rosrun ov_eval error_simulation
-save_total_state: true
-filepath_est: "/opt/baza/evals/ov_estimate.txt"
-filepath_std: "/opt/baza/evals/ov_estimate_std.txt"
-filepath_gt: "/opt/baza/evals/ov_groundtruth.txt"
+save_total_state: false
+filepath_est: "/tmp/ov_estimate.txt"
+filepath_std: "/tmp/ov_estimate_std.txt"
+filepath_gt: "/tmp/ov_groundtruth.txt"
 
 # ==================================================================
 # ==================================================================
+
+
+# ["Mix", "ALike", "KLT"]
+#  ALike - CNN for features, MNN for tracking
+#  KLT   - FAST feaatures, KLT for tracking
+#  Mix   - ALike for affine guess, then FAST features and KLT for tracking
+tracker_type: KLT
 
 # our front-end feature tracking parameters
 # we have a KLT and descriptor based (KLT is better implemented...)
-use_klt: false # if true we will use KLT, otherwise use a ORB descriptor + robust matching
-num_pts: 1000 # number of points (per camera) we will extract and try to track
-fast_threshold: 20 # threshold for fast extraction (warning: lower threshs can be expensive)
+# use_klt: true # if true we will use KLT, otherwise use a ORB descriptor + robust matching
+num_pts: 400 # number of points (per camera) we will extract and try to track
+# num_pts: 200 # number of points (per camera) we will extract and try to track
+# fast_threshold: 20 # threshold for fast extraction (warning: lower threshs can be expensive)
+fast_threshold: 15 # threshold for fast extraction (warning: lower threshs can be expensive)
 grid_x: 5 # extraction sub-grid count for horizontal direction (uniform tracking)
-grid_y: 5 # extraction sub-grid count for vertical direction (uniform tracking)
-min_px_dist: 10 # distance between features (features near each other provide less information)
+# grid_y: 5 # extraction sub-grid count for vertical direction (uniform tracking)
+grid_y: 3 # extraction sub-grid count for vertical direction (uniform tracking)
+# min_px_dist: 10 # distance between features (features near each other provide less information)
+min_px_dist: 20 # distance between features (features near each other provide less information)
 knn_ratio: 0.70 # descriptor knn threshold for the top two descriptor matches
 track_frequency: 21.0 # frequency we will perform feature tracking at (in frames per second / hertz)
 downsample_cameras: false # will downsample image in half if true
@@ -98,13 +111,11 @@ num_aruco: 1024
 downsize_aruco: true
 
 # ALike-based tracker options
-use_alike: true
 alike_radius: 1 # Radius of the local regions on score map, from which max intensity keypoints are extracted. 
                 # (bigger radius - sparser points)
-alike_padding: 2 # ALike gives false positives on the borders. Adjust padding to remove them.
-alike_match_threshold: 0.9 # Threshold for filtering false positives from matched keypoints
-alike_model_path: "/opt/baza/alike/model/model.onnx"
-
+alike_padding: 4 # ALike gives false positives on the borders. Adjust padding to remove them.
+alike_match_threshold: 0.92 # Threshold for filtering false positives from matched keypoints
+alike_model_path: "/opt/baza/src/alike_extractor/models/normal_640x480.onnx"
 
 # ==================================================================
 # ==================================================================
@@ -124,3 +135,6 @@ use_mask: false
 # imu config should also have the correct noise values
 relative_config_imu: "kalibr_imu_chain.yaml"
 relative_config_imucam: "kalibr_imucam_chain.yaml"
+
+
+fi_max_dist: 200.0 # max distance for the features 
