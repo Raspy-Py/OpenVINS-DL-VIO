@@ -31,6 +31,17 @@ catkin config --jobs 4
 catkin init
 catkin build
 source ~/.bashrc # to make all built modules visible 
+catkin install
 ```
 
-5.
+5. Run ALIKE test target to ensure the enviroment is healthy.
+```bash
+/opt/bash/install/alike_extractor/alike_test \
+    /opt/baza/src/alike_extractor/models/normal_640x480.onnx \
+    /opt/baza/images/test_examples/tum_input.png \
+    /opt/baza/images/test_ouputs
+```
+Check inside `/opt/baza/images/test_examples` for such expected results
+| ![scores_map](images/test_examples/scores_map.png) | ![labeled_score_map](images/test_examples/labeled_score_map.png) | ![results_image](images/test_examples/results_image.png) |
+|:----------------------:|:----------------------:|:----------------------:|
+| scores map | labeled scores map | results image |
